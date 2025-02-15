@@ -24,6 +24,20 @@ func NewMissionRepository(db *gorm.DB) *MissionRepository {
 }
 
 func (r *MissionRepository) CreateMission(mission *models.Mission) error {
+	if mission.CatID != nil {
+		var count int64
+		err := r.db.Raw(`
+            SELECT COUNT(*) FROM missions 
+            WHERE cat_id = ? AND completed = FALSE AND deleted_at IS NULL
+        `, mission.CatID).Scan(&count).Error
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return errors.New("this cat is already assigned to another active mission")
+		}
+	}
+
 	return r.db.Create(mission).Error
 }
 

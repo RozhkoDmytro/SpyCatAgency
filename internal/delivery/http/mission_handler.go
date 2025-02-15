@@ -34,7 +34,7 @@ func (h *MissionHandler) CreateMission(c *gin.Context) {
 	}
 
 	if err := h.service.CreateMission(&mission); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create mission"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create mission." + err.Error()})
 		return
 	}
 
