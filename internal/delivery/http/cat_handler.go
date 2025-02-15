@@ -35,7 +35,7 @@ func (h *CatHandler) GetCat(c *gin.Context) {
 	c.JSON(http.StatusOK, cat)
 }
 
-func (h *CatHandler) GetAllCatsHandler(c *gin.Context) {
+func (h *CatHandler) GetAllCats(c *gin.Context) {
 	cats, err := h.service.GetAllCatsLimited()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve cats"})
