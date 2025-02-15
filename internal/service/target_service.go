@@ -5,32 +5,32 @@ import (
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/repository"
 )
 
-// TargetService керує логікою цілей
+// TargetService handles target-related logic
 type TargetService struct {
 	repo *repository.TargetRepository
 }
 
-// NewTargetService створює новий сервіс цілей
+// NewTargetService creates a new service instance
 func NewTargetService(repo *repository.TargetRepository) *TargetService {
 	return &TargetService{repo: repo}
 }
 
-// CompleteTarget позначає ціль як завершену
+// CompleteTarget marks a target as completed
 func (s *TargetService) CompleteTarget(targetID uint) error {
 	return s.repo.MarkTargetAsCompleted(targetID)
 }
 
-// UpdateTargetNotes оновлює нотатки цілі (якщо вона не завершена)
+// UpdateTargetNotes updates the notes for a target
 func (s *TargetService) UpdateTargetNotes(targetID uint, notes []string) error {
 	return s.repo.UpdateTargetNotes(targetID, notes)
 }
 
-// AddTargetToMission додає нову ціль до існуючої місії (якщо місія не завершена)
+// AddTargetToMission adds a new target to an existing mission
 func (s *TargetService) AddTargetToMission(target *models.Target) error {
 	return s.repo.AddTargetToMission(target)
 }
 
-// DeleteTarget видаляє ціль (якщо вона не завершена)
+// DeleteTarget deletes a target
 func (s *TargetService) DeleteTarget(targetID uint) error {
 	return s.repo.DeleteTarget(targetID)
 }

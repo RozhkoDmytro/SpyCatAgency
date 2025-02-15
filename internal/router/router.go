@@ -33,6 +33,7 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 
 	r.POST("/missions", missionHandler.CreateMission)
 	r.GET("/missions", missionHandler.GetAllMissions)
+	r.GET("/missions/:id", missionHandler.GetMissionByID)
 	r.PUT("/missions/:mission_id/cats/:cat_id", missionHandler.AssignCatToMission)
 	r.PUT("/missions/:mission_id/complete", missionHandler.CompleteMission)
 	r.DELETE("/missions/:id", missionHandler.DeleteMission)
@@ -42,10 +43,10 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 	targetService := service.NewTargetService(targetRepo)
 	targetHandler := handler.NewTargetHandler(targetService)
 
-	r.PUT("/targets/:target_id/complete", targetHandler.CompleteTargetHandler)
-	r.PUT("/targets/:target_id/notes", targetHandler.UpdateTargetNotesHandler)
-	r.POST("/missions/:mission_id/targets", targetHandler.AddTargetToMissionHandler)
-	r.DELETE("/targets/:target_id", targetHandler.DeleteTargetHandler)
+	r.PUT("/targets/:target_id/complete", targetHandler.CompleteTarget)
+	r.PUT("/targets/:target_id/notes", targetHandler.UpdateTargetNotes)
+	r.POST("/missions/:mission_id/targets", targetHandler.AddTargetToMission)
+	r.DELETE("/targets/:target_id", targetHandler.DeleteTarget)
 
 	return r
 }

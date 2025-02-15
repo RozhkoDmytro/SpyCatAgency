@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"encoding/json"
+
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/models"
 	"gorm.io/gorm"
 )
@@ -17,15 +19,35 @@ func NewTargetRepository(db *gorm.DB) *TargetRepository {
 
 // MarkTargetAsCompleted позначає ціль як завершену
 func (r *TargetRepository) MarkTargetAsCompleted(targetID uint) error {
-	return r.db.Model(&models.Target{}).Where("id = ?", targetID).Update("completed", true).Error
+	result := r.db.Exec("UPDATE targets SET completed = ? WHERE id = ?", true, targetID)
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return result.Error
 }
 
 // UpdateTargetNotes оновлює нотатки цілі (якщо вона не завершена)
 func (r *TargetRepository) UpdateTargetNotes(targetID uint, notes []string) error {
-	return r.db.Model(&models.Target{}).
-		Where("id = ? AND completed = false", targetID).
-		Update("notes", notes).
-		Error
+	notesJSON, err := json.Marshal(notes)
+	if err != nil {
+		return err
+	}
+
+	result := r.db.Exec(`
+		UPDATE targets 
+		SET notes = ?, updated_at = NOW() 
+		WHERE id = ? 
+		AND completed = FALSE 
+		AND mission_id IN (SELECT id FROM missions WHERE completed = FALSE)
+	`, notesJSON, targetID)
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return result.Error
 }
 
 // AddTargetToMission додає нову ціль до місії (якщо місія не завершена)

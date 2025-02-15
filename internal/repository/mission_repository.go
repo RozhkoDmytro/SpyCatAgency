@@ -101,7 +101,13 @@ func (r *MissionRepository) AssignCatToMission(missionID uint, catID *uint) erro
 }
 
 func (r *MissionRepository) MarkMissionAsCompleted(missionID uint) error {
-	return r.db.Model(&models.Mission{}).Where("id = ?", missionID).Update("completed", true).Error
+	result := r.db.Exec("UPDATE missions SET completed = ? WHERE id = ?", true, missionID)
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return result.Error
 }
 
 func (r *MissionRepository) DeleteMission(id uint) error {

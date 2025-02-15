@@ -7,20 +7,18 @@ import (
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/models"
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/service"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-// TargetHandler обробляє HTTP-запити для цілей
 type TargetHandler struct {
 	service *service.TargetService
 }
 
-// NewTargetHandler створює новий хендлер цілей
 func NewTargetHandler(service *service.TargetService) *TargetHandler {
 	return &TargetHandler{service: service}
 }
 
-// CompleteTargetHandler позначає ціль як завершену
-func (h *TargetHandler) CompleteTargetHandler(c *gin.Context) {
+func (h *TargetHandler) CompleteTarget(c *gin.Context) {
 	targetID, _ := strconv.Atoi(c.Param("target_id"))
 
 	if err := h.service.CompleteTarget(uint(targetID)); err != nil {
@@ -30,8 +28,7 @@ func (h *TargetHandler) CompleteTargetHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Target completed"})
 }
 
-// UpdateTargetNotesHandler оновлює нотатки цілі
-func (h *TargetHandler) UpdateTargetNotesHandler(c *gin.Context) {
+func (h *TargetHandler) UpdateTargetNotes(c *gin.Context) {
 	targetID, _ := strconv.Atoi(c.Param("target_id"))
 
 	var req struct {
@@ -43,15 +40,23 @@ func (h *TargetHandler) UpdateTargetNotesHandler(c *gin.Context) {
 		return
 	}
 
+	if len(req.Notes) == 0 || len(req.Notes) > 3 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Notes cannot be empty or > 3"})
+		return
+	}
+
 	if err := h.service.UpdateTargetNotes(uint(targetID), req.Notes); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to update notes"})
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Target not found. Or mission | target is completed"})
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to update notes"})
+		}
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Notes updated"})
 }
 
-// AddTargetToMissionHandler додає ціль до місії
-func (h *TargetHandler) AddTargetToMissionHandler(c *gin.Context) {
+func (h *TargetHandler) AddTargetToMission(c *gin.Context) {
 	missionID, _ := strconv.Atoi(c.Param("mission_id"))
 
 	var target models.Target
@@ -70,8 +75,7 @@ func (h *TargetHandler) AddTargetToMissionHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, target)
 }
 
-// DeleteTargetHandler видаляє ціль (якщо вона не завершена)
-func (h *TargetHandler) DeleteTargetHandler(c *gin.Context) {
+func (h *TargetHandler) DeleteTarget(c *gin.Context) {
 	targetID, _ := strconv.Atoi(c.Param("target_id"))
 
 	if err := h.service.DeleteTarget(uint(targetID)); err != nil {
