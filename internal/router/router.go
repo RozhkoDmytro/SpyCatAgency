@@ -2,6 +2,7 @@ package router
 
 import (
 	handler "github.com/RozhkoDmytro/SpyCatAgency/internal/delivery/http"
+	"github.com/RozhkoDmytro/SpyCatAgency/internal/middleware"
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/repository"
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/service"
 	"github.com/gin-gonic/gin"
@@ -10,6 +11,9 @@ import (
 
 func InitRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
+
+	r.Use(middleware.LoggerMiddleware()) // Передаємо лог-файл у middleware
+	r.Use(gin.Recovery())
 
 	//  CatHandler
 	catRepo := repository.NewCatRepository(db)
@@ -29,7 +33,6 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 
 	r.POST("/missions", missionHandler.CreateMission)
 	r.GET("/missions", missionHandler.GetAllMissions)
-	r.GET("/missions/:id", missionHandler.GetMissionByID)
 	r.PUT("/missions/:mission_id/cats/:cat_id", missionHandler.AssignCatToMission)
 	r.PUT("/missions/:mission_id/complete", missionHandler.CompleteMission)
 	r.DELETE("/missions/:id", missionHandler.DeleteMission)

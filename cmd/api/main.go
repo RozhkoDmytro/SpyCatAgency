@@ -5,11 +5,18 @@ import (
 	"os"
 
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/config"
+	"github.com/RozhkoDmytro/SpyCatAgency/internal/middleware"
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/router"
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	logFile, err := middleware.InitMiddlewareLogger()
+	if err != nil {
+		log.Fatal("❌ Failed to initialize middleware logger:", err)
+	}
+	defer logFile.Close()
+
 	if err := godotenv.Load(); err != nil {
 		log.Println("⚠️ Warning: No .env file found, using default env variables")
 	}
