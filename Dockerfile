@@ -40,6 +40,3 @@ COPY .env .env
 
 # Expose the application port
 EXPOSE 8080
-
-# Run migrations before starting the app
-CMD ["/usr/local/bin/migrate", "-path", "/migrations", "-database", "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable", "up"] && ["/root/spycat-api"]

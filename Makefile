@@ -50,19 +50,10 @@ docker-run:
 # Apply database migrations
 .PHONY: migrate-up
 migrate-up:
+	@command -v migrate >/dev/null 2>&1 || { echo >&2 "migrate is not installed. Run: go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest"; exit 1; }
 	migrate -path migrations -database "$(DB_URL)" up
 
 # Rollback the last migration
 .PHONY: migrate-down
 migrate-down:
 	migrate -path migrations -database "$(DB_URL)" down 1
-
-# Create a new migration file
-.PHONY: create-migration
-create-migration:
-	migrate create -ext sql -dir migrations -seq $(NAME)
-
-# Stop and remove Docker containers
-.PHONY: docker-stop
-docker-stop:
-	docker-compose down
