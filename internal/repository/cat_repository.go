@@ -36,6 +36,9 @@ func (r *CatRepository) CreateCat(cat *models.Cat) error {
 
 func (r *CatRepository) UpdateSalary(id string, salary float64) error {
 	result := r.db.Exec("UPDATE cats SET salary = ? WHERE id = ?", salary, id)
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
 	return result.Error
 }
 

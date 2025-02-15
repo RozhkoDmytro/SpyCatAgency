@@ -2,6 +2,7 @@ package repository
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/models"
 	"gorm.io/gorm"
@@ -86,18 +87,18 @@ func (r *MissionRepository) GetMissionByID(id uint) (*MissionWithTargets, error)
 }
 
 func (r *MissionRepository) AssignCatToMission(missionID uint, catID *uint) error {
-	var result *gorm.DB
-
-	if catID == nil {
-		result = r.db.Exec("UPDATE missions SET cat_id = NULL WHERE id = ?", missionID)
-	} else {
-		result = r.db.Exec("UPDATE missions SET cat_id = ? WHERE id = ?", *catID, missionID)
+	var existingMission models.Mission
+	if catID != nil {
+		err := r.db.Where("cat_id = ? AND completed = FALSE and deleted_at IS NULL", *catID).First(&existingMission).Error
+		if err == nil {
+			return errors.New("this cat is already assigned to another mission")
+		}
 	}
 
+	result := r.db.Model(&models.Mission{}).Where("id = ?", missionID).Update("cat_id", catID)
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound
 	}
-
 	return result.Error
 }
 

@@ -83,7 +83,7 @@ func (h *MissionHandler) AssignCatToMission(c *gin.Context) {
 
 	err := h.service.AssignCatToMission(uint(missionID), catID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to assign cat to mission"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to assign cat to mission. " + err.Error()})
 		return
 	}
 
