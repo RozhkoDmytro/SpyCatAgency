@@ -1,0 +1,7 @@
+echo "bin/
+*.log
+*.out
+vendor/
+.env
+.DS_Store
+" > .gitignore
