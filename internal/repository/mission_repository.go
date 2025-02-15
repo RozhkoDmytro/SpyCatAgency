@@ -40,10 +40,11 @@ func (r *MissionRepository) GetAllMissions() ([]MissionWithTargets, error) {
 						'notes', t.notes,
 						'completed', t.completed
 					)
-				) FILTER (WHERE t.id IS NOT NULL), '[]'
+				) FILTER (WHERE t.id IS NOT NULL and t.deleted_at IS NULL), '[]'
 			) AS targets
 		FROM missions m
 		LEFT JOIN targets t ON m.id = t.mission_id
+		WHERE m.deleted_at IS NULL
 		GROUP BY m.id
 	`
 	err := r.db.Raw(query).Scan(&missions).Error
@@ -64,11 +65,11 @@ func (r *MissionRepository) GetMissionByID(id uint) (*MissionWithTargets, error)
 						'notes', t.notes,
 						'completed', t.completed
 					)
-				) FILTER (WHERE t.id IS NOT NULL), '[]'
+				) FILTER (WHERE t.id IS NOT NULL and t.deleted_at IS NULL), '[]'
 			) AS targets
 		FROM missions m
 		LEFT JOIN targets t ON m.id = t.mission_id
-		WHERE m.id = ?
+		WHERE m.id = ? and m.deleted_at IS NULL
 		GROUP BY m.id
 	`
 
