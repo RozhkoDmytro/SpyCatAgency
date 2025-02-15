@@ -1,31 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
-	"github.com/gin-gonic/gin"
+	"github.com/RozhkoDmytro/SpyCatAgency/internal/config"
+	"github.com/RozhkoDmytro/SpyCatAgency/internal/router"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Load .env file
 	if err := godotenv.Load(); err != nil {
-		log.Println("Warning: No .env file found, using default env variables")
+		log.Println("⚠️ Warning: No .env file found, using default env variables")
 	}
 
-	r := gin.Default()
+	db := config.InitDB()
 
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "Spy Cat Agency API is running..."})
-	})
+	r := router.InitRouter(db)
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080" // Default port
+		port = "8080"
 	}
 
-	fmt.Println("Starting Spy Cat Agency API on port " + port + "...")
+	log.Println("🚀 Spy Cat Agency API is running on port " + port + "...")
 	r.Run(":" + port)
 }
