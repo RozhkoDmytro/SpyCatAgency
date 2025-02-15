@@ -7,6 +7,7 @@ import (
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/config"
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/middleware"
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/router"
+	"github.com/RozhkoDmytro/SpyCatAgency/internal/service"
 	"github.com/joho/godotenv"
 )
 
@@ -19,6 +20,10 @@ func main() {
 
 	if err := godotenv.Load(); err != nil {
 		log.Println("⚠️ Warning: No .env file found, using default env variables")
+	}
+
+	if err := service.LoadBreeds(); err != nil {
+		log.Fatal("❌ Failed to load cat breeds:", err) // Зупиняємо програму, якщо список не вдалося завантажити
 	}
 
 	db := config.InitDB()

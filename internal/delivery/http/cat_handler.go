@@ -51,6 +51,12 @@ func (h *CatHandler) CreateCat(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
+
+	if !service.IsValidBreed(cat.Breed) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid breed"})
+		return
+	}
+
 	if err := h.service.CreateCat(&cat); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create cat"})
 		return
