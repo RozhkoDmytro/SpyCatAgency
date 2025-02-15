@@ -1,0 +1,13 @@
+package models
+
+import (
+	"gorm.io/gorm"
+)
+
+// Mission represents a spy mission
+type Mission struct {
+	gorm.Model
+	CatID     uint     `json:"cat_id" gorm:"not null"`
+	Completed bool     `json:"completed" gorm:"default:false"`
+	Targets   []Target `json:"targets" gorm:"foreignKey:MissionID;constraint:OnDelete:CASCADE"`
+}

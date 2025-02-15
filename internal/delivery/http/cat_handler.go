@@ -35,6 +35,16 @@ func (h *CatHandler) GetCat(c *gin.Context) {
 	c.JSON(http.StatusOK, cat)
 }
 
+func (h *CatHandler) GetAllCatsHandler(c *gin.Context) {
+	cats, err := h.service.GetAllCatsLimited()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve cats"})
+		return
+	}
+
+	c.JSON(http.StatusOK, cats)
+}
+
 func (h *CatHandler) CreateCat(c *gin.Context) {
 	var cat models.Cat
 	if err := c.ShouldBindJSON(&cat); err != nil {
@@ -49,16 +59,23 @@ func (h *CatHandler) CreateCat(c *gin.Context) {
 }
 
 func (h *CatHandler) UpdateCat(c *gin.Context) {
-	var cat models.Cat
-	if err := c.ShouldBindJSON(&cat); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+	var req struct {
+		ID     string  `json:"id" binding:"required"`
+		Salary float64 `json:"salary" binding:"required,gt=0"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 		return
 	}
-	if err := h.service.UpdateCat(&cat); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update cat"})
+
+	err := h.service.UpdateCatSalary(req.ID, req.Salary)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update salary"})
 		return
 	}
-	c.JSON(http.StatusOK, cat)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Salary updated successfully"})
 }
 
 func (h *CatHandler) DeleteCat(c *gin.Context) {

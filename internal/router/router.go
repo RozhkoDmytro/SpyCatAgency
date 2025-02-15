@@ -16,6 +16,7 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 	catHandler := handler.NewCatHandler(catService)
 
 	r.GET("/cats/:id", catHandler.GetCat)
+	r.GET("/cats", catHandler.GetAllCatsHandler)
 	r.POST("/cats", catHandler.CreateCat)
 	r.PUT("/cats", catHandler.UpdateCat)
 	r.DELETE("/cats/:id", catHandler.DeleteCat)
