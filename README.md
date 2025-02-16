@@ -15,6 +15,8 @@ This project is a RESTful API for managing a spy cat agency. It allows managing 
    ```sh
    docker-compose up -d
    ```
+   
+   OR
 
    ```sh
    make docker-run
