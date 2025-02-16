@@ -57,3 +57,22 @@ migrate-up:
 .PHONY: migrate-down
 migrate-down:
 	migrate -path migrations -database "$(DB_URL)" down 1
+
+.PHONY: docker-clean docker-rebuild
+
+DOCKER := $(shell command -v docker 2>/dev/null)
+
+docker-clean:
+	@if [ -z "$(DOCKER)" ]; then \
+		echo "❌ Error: Docker is not installed or not in PATH"; exit 1; \
+	fi
+	docker compose down --volumes --remove-orphans || true
+	docker volume prune -f || true
+	docker rmi $(shell docker images -q spycatagency-api) || true
+
+docker-rebuild: docker-clean
+	@if [ -z "$(DOCKER)" ]; then \
+		echo "❌ Error: Docker is not installed or not in PATH"; exit 1; \
+	fi
+	docker compose up --build -d
+
