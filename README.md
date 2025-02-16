@@ -13,7 +13,7 @@ This project is a RESTful API for managing a spy cat agency. It allows managing 
 
 2. Start the database using Docker:
    ```sh
-   docker-compose up -d
+   docker-compose up --build
    ```
    
    OR
