@@ -2,6 +2,7 @@ package repository
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/RozhkoDmytro/SpyCatAgency/internal/models"
 	"gorm.io/gorm"
@@ -47,13 +48,18 @@ func (r *TargetRepository) UpdateTargetNotes(targetID uint, notes []string) erro
 }
 
 func (r *TargetRepository) AddTargetToMission(target *models.Target) error {
-	var mission models.Mission
-	if err := r.db.First(&mission, target.MissionID).Error; err != nil {
+	var count int64
+
+	err := r.db.Raw(`
+		SELECT COUNT(*) FROM targets 
+		WHERE mission_id = ? AND completed = FALSE AND deleted_at IS NULL
+	`, target.MissionID).Scan(&count).Error
+	if err != nil {
 		return err
 	}
 
-	if mission.Completed {
-		return gorm.ErrInvalidData
+	if count >= 3 {
+		return errors.New("mission already has the maximum number of active targets")
 	}
 
 	return r.db.Create(target).Error

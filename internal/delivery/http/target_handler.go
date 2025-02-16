@@ -19,7 +19,11 @@ func NewTargetHandler(service *service.TargetService) *TargetHandler {
 }
 
 func (h *TargetHandler) CompleteTarget(c *gin.Context) {
-	targetID, _ := strconv.Atoi(c.Param("target_id"))
+	targetID, err := strconv.Atoi(c.Param("target_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid target ID"})
+		return
+	}
 
 	if err := h.service.CompleteTarget(uint(targetID)); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to complete target"})
@@ -29,7 +33,11 @@ func (h *TargetHandler) CompleteTarget(c *gin.Context) {
 }
 
 func (h *TargetHandler) UpdateTargetNotes(c *gin.Context) {
-	targetID, _ := strconv.Atoi(c.Param("target_id"))
+	targetID, err := strconv.Atoi(c.Param("target_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid target ID"})
+		return
+	}
 
 	var req struct {
 		Notes []string `json:"notes"`
@@ -37,11 +45,6 @@ func (h *TargetHandler) UpdateTargetNotes(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
-		return
-	}
-
-	if len(req.Notes) == 0 || len(req.Notes) > 3 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Notes cannot be empty or > 3"})
 		return
 	}
 
@@ -57,7 +60,11 @@ func (h *TargetHandler) UpdateTargetNotes(c *gin.Context) {
 }
 
 func (h *TargetHandler) AddTargetToMission(c *gin.Context) {
-	missionID, _ := strconv.Atoi(c.Param("mission_id"))
+	missionID, err := strconv.Atoi(c.Param("mission_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid mission ID"})
+		return
+	}
 
 	var target models.Target
 	if err := c.ShouldBindJSON(&target); err != nil {
@@ -68,7 +75,7 @@ func (h *TargetHandler) AddTargetToMission(c *gin.Context) {
 	target.MissionID = uint(missionID)
 
 	if err := h.service.AddTargetToMission(&target); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to add target"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to add target. " + err.Error()})
 		return
 	}
 
@@ -76,7 +83,11 @@ func (h *TargetHandler) AddTargetToMission(c *gin.Context) {
 }
 
 func (h *TargetHandler) DeleteTarget(c *gin.Context) {
-	targetID, _ := strconv.Atoi(c.Param("target_id"))
+	targetID, err := strconv.Atoi(c.Param("target_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid target ID"})
+		return
+	}
 
 	if err := h.service.DeleteTarget(uint(targetID)); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to delete target"})

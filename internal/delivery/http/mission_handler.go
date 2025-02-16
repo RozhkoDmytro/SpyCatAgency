@@ -67,7 +67,12 @@ func (h *MissionHandler) GetAllMissions(c *gin.Context) {
 }
 
 func (h *MissionHandler) AssignCatToMission(c *gin.Context) {
-	missionID, _ := strconv.Atoi(c.Param("mission_id"))
+	missionID, err := strconv.Atoi(c.Param("mission_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid mission ID"})
+		return
+	}
+
 	catIDParam := c.Param("cat_id")
 
 	var catID *uint
@@ -81,7 +86,7 @@ func (h *MissionHandler) AssignCatToMission(c *gin.Context) {
 		catID = &catIDValue
 	}
 
-	err := h.service.AssignCatToMission(uint(missionID), catID)
+	err = h.service.AssignCatToMission(uint(missionID), catID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to assign cat to mission. " + err.Error()})
 		return
@@ -92,7 +97,11 @@ func (h *MissionHandler) AssignCatToMission(c *gin.Context) {
 
 // CompleteMissionHandler позначає місію як завершену
 func (h *MissionHandler) CompleteMission(c *gin.Context) {
-	missionID, _ := strconv.Atoi(c.Param("mission_id"))
+	missionID, err := strconv.Atoi(c.Param("mission_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid mission ID"})
+		return
+	}
 
 	if err := h.service.CompleteMission(uint(missionID)); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to complete mission"})
@@ -102,7 +111,12 @@ func (h *MissionHandler) CompleteMission(c *gin.Context) {
 }
 
 func (h *MissionHandler) DeleteMission(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid mission ID"})
+		return
+	}
+
 	if err := h.service.DeleteMission(uint(id)); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete mission"})
 		return
