@@ -7,8 +7,8 @@ This project is a RESTful API for managing a spy cat agency. It allows managing 
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-repo/spy-cat-agency.git
-   cd spy-cat-agency
+   git clone https://github.com/RozhkoDmytro/SpyCatAgency.git
+   cd SpyCatAgency
    ```
 
 2. Start the database using Docker:
