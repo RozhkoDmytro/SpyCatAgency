@@ -42,7 +42,7 @@ func (h *MissionHandler) CreateMission(c *gin.Context) {
 }
 
 func (h *MissionHandler) GetMissionByID(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("mission_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid mission ID"})
 		return
@@ -111,7 +111,7 @@ func (h *MissionHandler) CompleteMission(c *gin.Context) {
 }
 
 func (h *MissionHandler) DeleteMission(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("mission_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid mission ID"})
 		return

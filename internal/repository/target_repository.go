@@ -47,6 +47,45 @@ func (r *TargetRepository) UpdateTargetNotes(targetID uint, notes []string) erro
 	return result.Error
 }
 
+func (r *TargetRepository) AddNoteToTarget(targetID uint, note string) error {
+	var notesJSON string // Отримуємо `notes` у форматі JSON-рядка
+
+	query := `
+		SELECT JSON_AGG(
+			JSON_BUILD_OBJECT('entry', n.entry)
+		) FILTER (WHERE n.entry IS NOT NULL)
+		FROM (
+			SELECT jsonb_array_elements_text(notes) AS entry
+			FROM targets 
+			WHERE id = ? AND deleted_at IS NULL
+		) n
+	`
+	if err := r.db.Raw(query, targetID).Scan(&notesJSON).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("target not found")
+		}
+		return errors.New("error retrieving target notes: " + err.Error())
+	}
+
+	var notes []map[string]string
+	if notesJSON != "" {
+		if err := json.Unmarshal([]byte(notesJSON), &notes); err != nil {
+			return errors.New("failed to parse existing notes: " + err.Error())
+		}
+	}
+
+	var simpleNotes []string
+	for _, entry := range notes {
+		if text, exists := entry["entry"]; exists {
+			simpleNotes = append(simpleNotes, text)
+		}
+	}
+
+	simpleNotes = append(simpleNotes, note)
+
+	return r.UpdateTargetNotes(targetID, simpleNotes)
+}
+
 func (r *TargetRepository) AddTargetToMission(target *models.Target) error {
 	var count int64
 

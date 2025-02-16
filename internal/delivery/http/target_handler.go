@@ -59,6 +59,31 @@ func (h *TargetHandler) UpdateTargetNotes(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Notes updated"})
 }
 
+func (h *TargetHandler) AddNoteToTarget(c *gin.Context) {
+	var request struct {
+		Note string `json:"note" binding:"required"`
+	}
+
+	targetID, err := strconv.Atoi(c.Param("target_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid target ID"})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	err = h.service.AddNoteToTarget(uint(targetID), request.Note)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Note added successfully"})
+}
+
 func (h *TargetHandler) AddTargetToMission(c *gin.Context) {
 	missionID, err := strconv.Atoi(c.Param("mission_id"))
 	if err != nil {

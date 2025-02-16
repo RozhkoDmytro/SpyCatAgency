@@ -25,6 +25,10 @@ func (s *TargetService) UpdateTargetNotes(targetID uint, notes []string) error {
 	return s.repo.UpdateTargetNotes(targetID, notes)
 }
 
+func (s *TargetService) AddNoteToTarget(targetID uint, note string) error {
+	return s.repo.AddNoteToTarget(targetID, note)
+}
+
 // AddTargetToMission adds a new target to an existing mission
 func (s *TargetService) AddTargetToMission(target *models.Target) error {
 	return s.repo.AddTargetToMission(target)
