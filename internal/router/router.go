@@ -12,7 +12,7 @@ import (
 func InitRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 
-	r.Use(middleware.LoggerMiddleware()) // Передаємо лог-файл у middleware
+	r.Use(middleware.LoggerMiddleware())
 	r.Use(gin.Recovery())
 
 	//  CatHandler

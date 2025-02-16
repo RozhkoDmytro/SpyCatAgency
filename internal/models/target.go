@@ -8,7 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Target represents a target in a mission
 type Target struct {
 	gorm.Model
 	MissionID uint            `json:"mission_id" gorm:"not null"`
